@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang=en>
+    <head>
+        <meta charset="utf-8">
+        <title>Thoughts</title>
+
+        <link rel=stylesheet href="{{ url_for('static', filename='css/main.css') }}" media=all>
+
+        <script src="https://browserid.org/include.js" type="text/javascript"></script>
+        <script src="{{ url_for('static', filename='js/lib/jquery.js') }}" type="text/javascript"></script>
+        <script src="{{ url_for('static', filename='js/login.js') }}" type="text/javascript"></script>
+    </head>
+
+    <body>
+
+        <div id="user-info">
+        {% if 'openconv_email' in session and session['openconv_email'] %}
+            <p>
+                Connected as {{ session['openconv_email'] }} -
+                <a href="{{ url_for('logout') }}">logout</a>
+            </p>
+        {% else %}
+            <a href="#" id="browserid" title="Sign-in with BrowserID">
+                <img src="{{ url_for('static', filename='images/sign_in_browserid.png') }}" alt="Sign in">
+            </a>
+        {% endif %}
+        </div>
+
+        {% block content %}{% endblock %}
+
+    </body>
+</html>

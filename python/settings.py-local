@@ -1,0 +1,13 @@
+# key must be 16, 24 or 32 bytes long
+SECRET_KEY = 'SECRET_KEY'
+
+SESSION_SECRET = 'SESSION_SECRET'
+
+DOMAIN = 'http://yourdomain.here'
+PREFIX = 'openconv'
+
+DEBUG = True
+
+DATABASE_HOSTNAME = "localhost"
+DATABASE_PORT = 27017
+DATABASE_NAME = "openconversation"

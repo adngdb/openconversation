@@ -1,0 +1,44 @@
+{% extends "shared/layout.html" %}
+
+{% block content %}
+
+    <article>
+        <header>
+            <p><a href="{{ url_for('post', uuid=post._id) }}">{{ post.date }}</a></p>
+        </header>
+
+        <p>
+            {{ post.text|safe }}
+        </p>
+    </article>
+
+    <section>
+        <h2>Answers</h2>
+
+        <article>
+            <header>
+                <a href="http://dante.com/post/2de98uf432rhjdf">2012-04-02</a><br />
+                by <a href="http://dante.com">D.</a>
+            </header>
+
+            <p>
+                Some awesome answer by this dude.
+            </p>
+        </article>
+
+        <article>
+            <header>
+                <a href="http://machin.fr/post/2de98uf432rhjdf">2012-04-02</a><br />
+                by <a href="http://machin.fr">Bidule</a>
+            </header>
+
+            <p>
+                Une reponse en francais dans le texte.
+            </p>
+        </article>
+
+        <input value="{{ post.url }}" id="post-url">
+
+    </section>
+
+{% endblock %}

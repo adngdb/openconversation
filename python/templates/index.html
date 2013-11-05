@@ -1,0 +1,10 @@
+{% extends "shared/layout.html" %}
+
+{% block content %}
+    {% for billet in billets %}
+    <article>
+        {{ billet_block(billet) }}
+    </article>
+    {% endfor %}
+
+{% endblock %}

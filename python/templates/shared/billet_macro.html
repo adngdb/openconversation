@@ -1,0 +1,14 @@
+{% macro billet_block(billet) %}
+<header>
+    <h1><a href="{{ url_for('get_billet', billet_id=billet.billet_id) }}">{{ billet.title }}</a></h1>
+    <p>
+        By {{ billet.author }}<br />
+        <a href="{{ url_for('get_billet', billet_id=billet.billet_id) }}">{{ billet.date_created }}</a>
+    </p>
+    <p>
+        {{ billet.answers | length }} answers
+    </p>
+</header>
+
+<div class="content">{{ billet.content | safe }}</div>
+{% endmacro %}

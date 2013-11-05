@@ -1,0 +1,12 @@
+{% extends "shared/layout.html" %}
+
+{% block content %}
+
+    <form method="post" action="{{ url_for('create_post') }}" id="create-post">
+        <h2>Write an answer to <input name="answer-to"></h2>
+
+        <textarea name="post-text"></textarea>
+        <button type="submit">Post</button>
+    </form>
+
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "shared/layout.html" %}
+
+{% block content %}
+
+    {% if origin %}
+    <article class="origin">
+        {{ billet_block(origin) }}
+    </article>
+    {% endif %}
+
+    <article>
+        {{ billet_block(billet) }}
+    </article>
+
+    {% for answer in answers %}
+        <article>
+            {{ billet_block(answer) }}
+        </article>
+    {% endfor %}
+
+    <section>
+        {% if 'openconv_email' in session and session['openconv_email'] %}
+        <form method="post" action="{{ url_for('create_billet') }}" class="create-billet">
+            <input type="hidden" name="billet_answer_to" value="{{ billet.billet_id }}">
+            {% include 'shared/write_content.html' %}
+        </form>
+        {% else %}
+            {% include('shared/login_block.html') %}
+        {% endif %}
+    </section>
+
+{% endblock %}

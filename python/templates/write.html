@@ -1,0 +1,9 @@
+{% extends "shared/layout.html" %}
+
+{% block content %}
+
+    <form method="post" action="{{ url_for('create_billet') }}" class="create-billet">
+        {% include 'shared/write_content.html' %}
+    </form>
+
+{% endblock %}
