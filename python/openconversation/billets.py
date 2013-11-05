@@ -1,5 +1,3 @@
-import pymongo
-
 from . import Billet
 from .base import MongoBase
 

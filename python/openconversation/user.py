@@ -1,14 +1,12 @@
-import pymongo
-
-connection = pymongo.Connection()
-db = connection.openconversation
+from .base import MongoBase
 
 
-class User(object):
+class User(MongoBase):
 
     def __init__(self, email):
         data = self.get(email)
         self.isadmin = data and 'is_admin' in data and data['is_admin']
 
     def get(self, email):
-        return db.users.find_one({'email': email})
+        with self.get_connection() as connection:
+            return connection.users.find_one({'email': email})

@@ -1,5 +1,3 @@
-import pymongo
-
 from .base import MongoBase
 
 
