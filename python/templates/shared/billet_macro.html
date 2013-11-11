@@ -1,9 +1,11 @@
 {% macro billet_block(billet) %}
 <header>
-    <h1><a href="{{ url_for('get_billet', billet_id=billet.billet_id) }}">{{ billet.title }}</a></h1>
+    <h1>
+        <a href="{% if billet.is_distant() %}{{ billet.billet_id }}{% else %}{{ url_for('get_billet', billet_id=billet.billet_id) }}{% endif %}">{{ billet.title }}</a>
+    </h1>
     <p>
         By {{ billet.author }}<br />
-        <a href="{{ url_for('get_billet', billet_id=billet.billet_id) }}">{{ billet.date_created }}</a>
+        <a href="{% if billet.is_distant() %}{{ billet.billet_id }}{% else %}{{ url_for('get_billet', billet_id=billet.billet_id) }}{% endif %}">{{ billet.date_created }}</a>
     </p>
     <p>
         {{ billet.answers | length }} answers

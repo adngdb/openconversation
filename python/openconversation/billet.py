@@ -85,3 +85,6 @@ class Billet(MongoBase):
         '''
         with self.get_connection() as connection:
             connection.billets.save(data)
+
+    def is_distant(self):
+        return self._origin == DISTANT

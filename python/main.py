@@ -13,9 +13,11 @@ app = flask.Flask(__name__)
 app.config.from_object('settings')
 http = httplib2.Http()
 
+EMAIL_KEY = '%s_email' % settings.PREFIX
+
 
 def authenticated(f):
-    """Check if user is logged in"""
+    '''Check if user is logged in'''
     @wraps(f)
     def decorated(*args, **kwargs):
         if not get_user_email():
@@ -25,7 +27,7 @@ def authenticated(f):
 
 
 def isadministrator(f):
-    """Check if user is an admin"""
+    '''Check if user is an admin'''
     @wraps(f)
     def decorated(*args, **kwargs):
         user = oc.User(get_user_email())
@@ -36,7 +38,7 @@ def isadministrator(f):
 
 
 def get_user_email():
-    return flask.session.get('%s_email' % settings.PREFIX)
+    return flask.session.get(EMAIL_KEY)
 
 
 def json_encode(data):
@@ -162,7 +164,7 @@ def login():
     bid_data = json.loads(content)
 
     if bid_data['status'] == 'okay' and bid_data['email']:
-        flask.session['%s_email' % settings.PREFIX] = bid_data['email']
+        flask.session[EMAIL_KEY] = bid_data['email']
     else:
         print bid_data
 
@@ -171,8 +173,8 @@ def login():
 
 @app.route('/logout')
 def logout():
-    if '%s_email' % settings.PREFIX in flask.session:
-        flask.session.pop('%s_email' % settings.PREFIX, None)
+    if EMAIL_KEY in flask.session:
+        flask.session.pop(EMAIL_KEY, None)
     return flask.redirect(flask.url_for('index'))
 
 
