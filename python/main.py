@@ -1,16 +1,15 @@
 import datetime
 import flask
 import httplib2
-import json
+import simplejson as json
 import urllib
 import uuid
 from functools import wraps
 
 import openconversation as oc
-import settings
 
 app = flask.Flask(__name__)
-app.secret_key = settings.SECRET_KEY
+app.config.from_object('settings')
 http = httplib2.Http()
 
 
@@ -36,7 +35,14 @@ def isadministrator(f):
 
 
 def get_user_email():
-    return flask.session.get('%s_email' % settings.PREFIX)
+    return flask.session.get('%s_email' % app.config.PREFIX)
+
+
+def json_encode(data):
+    for key, item in data.items():
+        if isinstance(item, (datetime.date, datetime.datetime)):
+            data[key] = item.isoformat()
+    return json.dumps(data)
 
 
 #------------------------------------------------------------------------------
@@ -69,6 +75,9 @@ def get_billet(billet_id):
     origin = None
     answers = []
 
+    if flask.request.headers.get('content-type') == 'application/json':
+        return json_encode(billet.get())
+
     if billet.answer_to:
         # Get the billet this answers to
         origin = oc.Billet(billet.answer_to)
@@ -83,6 +92,21 @@ def get_billet(billet_id):
         origin=origin,
         answers=answers
     )
+
+
+@app.route('/billet/<billet_id>', methods=['POST'])
+def add_answer_to_billet(billet_id):
+    billet = oc.Billet(billet_id)
+
+    answer_id = flask.request.form.get('answer_id')
+
+    if not billet.answers:
+        billet.answers = [answer_id]
+    else:
+        billet.answers.append(answer_id)
+
+    billet.save()
+    return flask.make_response(('', 200, []))
 
 
 @app.route('/billet', methods=['POST'])
@@ -103,10 +127,7 @@ def create_billet():
 
     if billet.answer_to:
         origin_billet = oc.Billet(billet.answer_to)
-        if not origin_billet.answers:
-            origin_billet.answers = []
-        origin_billet.answers.append(billet.billet_id)
-        origin_billet.save()
+        origin_billet.add_answer(billet.billet_id)
 
     return flask.redirect(
         flask.url_for('get_billet', billet_id=billet.billet_id)
@@ -135,7 +156,7 @@ def login():
     bid_data = json.loads(content)
 
     if bid_data['status'] == 'okay' and bid_data['email']:
-        flask.session['%s_email' % settings.PREFIX] = bid_data['email']
+        flask.session['%s_email' % app.config.PREFIX] = bid_data['email']
     else:
         print bid_data
 
@@ -144,8 +165,8 @@ def login():
 
 @app.route('/logout')
 def logout():
-    if '%s_email' % settings.PREFIX in flask.session:
-        flask.session.pop('%s_email' % settings.PREFIX, None)
+    if '%s_email' % app.config.PREFIX in flask.session:
+        flask.session.pop('%s_email' % app.config.PREFIX, None)
     return flask.redirect(flask.url_for('index'))
 
 

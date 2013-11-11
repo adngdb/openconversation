@@ -3,6 +3,9 @@
 {% block content %}
 
     <form method="post" action="{{ url_for('create_billet') }}" class="create-billet">
+        <fieldset>
+            <input type="text" name="billet_answer_to" placeholder="Answer's ID (leave blank to create top level billet)">
+        </fieldset>
         {% include 'shared/write_content.html' %}
     </form>
 
