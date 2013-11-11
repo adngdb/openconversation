@@ -55,7 +55,7 @@ class Billet(MongoBase):
     def add_answer(self, answer_id):
         if self._origin == DISTANT:
             payload = {'answer_id': answer_id}
-            requests.post(self.billet_id, params=payload)
+            requests.post(self._url, params=payload)
         else:
             if not self.answers:
                 self.answers = [answer_id]
@@ -67,12 +67,11 @@ class Billet(MongoBase):
         '''Return a Billet's data from the mongodb database. '''
         if billet_id.startswith('http'):
             self._origin = DISTANT
+            self._url = billet_id
 
             # get from the network
             headers = {'content-type': 'application/json'}
-            print 'pulling billet %s' % billet_id
             r = requests.get(billet_id, headers=headers)
-            print r.url
             return r.json()
         else:
             self._origin = LOCAL

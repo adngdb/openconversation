@@ -77,7 +77,12 @@ def get_billet(billet_id):
     answers = []
 
     if flask.request.headers.get('content-type') == 'application/json':
-        return json_encode(billet.get())
+        data = billet.get()
+        data['billet_id'] = '%s/%s' % (
+            flask.request.host_url,
+            data['billet_id']
+        )
+        return json_encode(data)
 
     if billet.answer_to:
         # Get the billet this answers to
