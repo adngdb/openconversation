@@ -7,6 +7,7 @@ import uuid
 from functools import wraps
 
 import openconversation as oc
+import settings
 
 app = flask.Flask(__name__)
 app.config.from_object('settings')
@@ -35,7 +36,7 @@ def isadministrator(f):
 
 
 def get_user_email():
-    return flask.session.get('%s_email' % app.config.PREFIX)
+    return flask.session.get('%s_email' % settings.PREFIX)
 
 
 def json_encode(data):
@@ -141,7 +142,7 @@ def create_billet():
 def login():
     bid_fields = {
         'assertion': flask.request.form['assertion'],
-        'audience': 'http://localhost:5000'
+        'audience': flask.request.host_url
     }
     headers = {
         'Content-type': 'application/x-www-form-urlencoded'
@@ -156,7 +157,7 @@ def login():
     bid_data = json.loads(content)
 
     if bid_data['status'] == 'okay' and bid_data['email']:
-        flask.session['%s_email' % app.config.PREFIX] = bid_data['email']
+        flask.session['%s_email' % settings.PREFIX] = bid_data['email']
     else:
         print bid_data
 
@@ -165,8 +166,8 @@ def login():
 
 @app.route('/logout')
 def logout():
-    if '%s_email' % app.config.PREFIX in flask.session:
-        flask.session.pop('%s_email' % app.config.PREFIX, None)
+    if '%s_email' % settings.PREFIX in flask.session:
+        flask.session.pop('%s_email' % settings.PREFIX, None)
     return flask.redirect(flask.url_for('index'))
 
 
