@@ -26,12 +26,12 @@ def authenticated(f):
     return decorated
 
 
-def isadministrator(f):
+def is_administrator(f):
     '''Check if user is an admin'''
     @wraps(f)
     def decorated(*args, **kwargs):
         user = oc.User(get_user_email())
-        if not user.isadmin:
+        if not user.is_admin:
             return flask.redirect(flask.url_for('index'))
         return f(*args, **kwargs)
     return decorated
@@ -64,7 +64,7 @@ def write():
 
 @app.route('/admin/')
 @authenticated
-@isadministrator
+@is_administrator
 def admin():
     return flask.render_template('admin.html')
 
@@ -105,15 +105,9 @@ def get_billet(billet_id):
 @app.route('/billet/<billet_id>', methods=['POST'])
 def add_answer_to_billet(billet_id):
     billet = oc.Billet(billet_id)
-
     answer_id = flask.request.form.get('answer_id')
 
-    if not billet.answers:
-        billet.answers = [answer_id]
-    else:
-        billet.answers.append(answer_id)
-
-    billet.save()
+    billet.add_answer(answer_id)
     return flask.make_response(('', 200, []))
 
 
