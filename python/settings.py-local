@@ -1,12 +1,10 @@
 # key must be 16, 24 or 32 bytes long
 SECRET_KEY = 'SECRET_KEY'
 
-SESSION_SECRET = 'SESSION_SECRET'
-
-DOMAIN = 'http://yourdomain.here'
+DOMAIN = 'yourdomain.here:5000'
 PREFIX = 'openconv'
 
-DEBUG = True
+DEBUG = False
 
 DATABASE_HOSTNAME = "localhost"
 DATABASE_PORT = 27017
