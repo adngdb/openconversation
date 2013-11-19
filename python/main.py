@@ -6,7 +6,8 @@ import urllib
 import uuid
 from functools import wraps
 
-import openconversation as oc
+import openconversation.http as distant
+import openconversation.mongodb as local
 import settings
 
 app = flask.Flask(__name__)
@@ -30,7 +31,7 @@ def is_administrator(f):
     '''Check if user is an admin'''
     @wraps(f)
     def decorated(*args, **kwargs):
-        user = oc.User(get_user_email())
+        user = local.User(get_user_email())
         if not user.is_admin:
             return flask.redirect(flask.url_for('index'))
         return f(*args, **kwargs)
@@ -48,12 +49,20 @@ def json_encode(data):
     return json.dumps(data)
 
 
+def is_distant(billet_id):
+    return billet_id.startswith('http')
+
+
+# Custom jinja filters
+app.jinja_env.filters['is_distant'] = is_distant
+
+
 #------------------------------------------------------------------------------
 # Views entry points
 #------------------------------------------------------------------------------
 @app.route('/')
 def index():
-    billets = oc.Billets().get()
+    billets = local.Billets().get()
     return flask.render_template('index.html', billets=billets)
 
 
@@ -74,7 +83,7 @@ def admin():
 #------------------------------------------------------------------------------
 @app.route('/billet/<billet_id>', methods=['GET'])
 def get_billet(billet_id):
-    billet = oc.Billet(billet_id)
+    billet = local.Billet(billet_id)
     origin = None
     answers = []
 
@@ -88,11 +97,13 @@ def get_billet(billet_id):
 
     if billet.answer_to:
         # Get the billet this answers to
-        origin = oc.Billet(billet.answer_to)
+        oc_module = is_distant(billet.answer_to) and distant or local
+        origin = oc_module.Billet(billet.answer_to)
 
     if billet.answers:
         for answer_id in billet.answers:
-            answers.append(oc.Billet(answer_id))
+            oc_module = is_distant(answer_id) and distant or local
+            answers.append(oc_module.Billet(answer_id))
 
     return flask.render_template(
         'billet.html',
@@ -104,7 +115,7 @@ def get_billet(billet_id):
 
 @app.route('/billet/<billet_id>', methods=['POST'])
 def add_answer_to_billet(billet_id):
-    billet = oc.Billet(billet_id)
+    billet = local.Billet(billet_id)
     answer_id = flask.request.form.get('answer_id')
 
     billet.add_answer(answer_id)
@@ -114,7 +125,7 @@ def add_answer_to_billet(billet_id):
 @app.route('/billet', methods=['POST'])
 @authenticated
 def create_billet():
-    billet = oc.Billet()
+    billet = local.Billet()
 
     billet.billet_id = str(uuid.uuid4())
     billet.content = flask.request.form.get('billet_content')
@@ -128,7 +139,9 @@ def create_billet():
     billet.save()
 
     if billet.answer_to:
-        origin_billet = oc.Billet(billet.answer_to)
+        oc_module = is_distant(billet.answer_to) and distant or local
+
+        origin_billet = oc_module.Billet(billet.answer_to)
         origin_billet.add_answer(billet.billet_id)
 
     return flask.redirect(

@@ -1,7 +1,8 @@
+from openconversation.base import user
 from .base import MongoBase
 
 
-class User(MongoBase):
+class User(MongoBase, user.User):
 
     def __init__(self, email):
         data = self.get(email)
